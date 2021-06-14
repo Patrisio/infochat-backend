@@ -1,11 +1,12 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, EntityRepository, getConnection } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { UserRepository } from './user.repository';
 import { MailerService } from '@nestjs-modules/mailer';
-import { errorMonitor } from 'events';
+import { Tariff } from '../entities/tariff.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +17,21 @@ export class AuthService {
     private readonly mailerService: MailerService
   ) {}
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<{code: number, status: string}> {
-    return this.userRepository.signUp(authCredentialsDto);
+  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<{code: number, status: string, projectId: number}> {
+    const signUpResponse = await this.userRepository.signUp(authCredentialsDto);
+
+    if (signUpResponse.code === 200) {
+      await getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(Tariff)
+        .values({
+          project: signUpResponse.projectId,
+        })
+        .execute();
+    }
+
+    return signUpResponse;
   }
 
   async signIn(loginCredentialsDto: LoginCredentialsDto): Promise<{ accessToken: string, projectId: number }> {

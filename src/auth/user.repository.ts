@@ -13,36 +13,6 @@ export class UserRepository extends Repository<User> {
     console.log('CONTROLLER');
     const { username, phone, email, password, role, status } = authCredentialsDto;
 
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await this.hashPassword(password, salt);
-
-    // const project = await getConnection()
-    //   .createQueryBuilder()
-    //   .insert()
-    //   .into(Project)
-    //   .values({
-    //     name: 'test_project_name',
-    //   })
-    //   .execute();
-
-    // const projectId = project.raw[0].id;
-
-    // const user = await getConnection()
-    //   .createQueryBuilder()
-    //   .insert()
-    //   .into(User)
-    //   .values({
-    //     username,
-    //     phone,
-    //     email,
-    //     password: hashedPassword,
-    //     salt,
-    //     role,
-    //     status,
-    //   })
-    //   .execute();
-
-
     const user = new User();
     const project = new Project();
     
@@ -57,14 +27,12 @@ export class UserRepository extends Repository<User> {
     try {
       project.name = 'project_name333';
       await user.save();
-      console.log(project.users, 'project.users');
       project.users = [user];
 
       const projectData = await project.save();
       user.projects = [project];
       await user.save();
 
-      console.log(projectData, 'DATA');
       return {
         code: 200,
         status: 'success',
