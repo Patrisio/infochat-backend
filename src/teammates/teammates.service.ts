@@ -17,6 +17,10 @@ export class TeammatesService {
     return this.userRepository.addTeammate(teammateDto);
   }
 
+  async updateTeammate(teammateDto, projectId) {
+    return this.userRepository.updateTeammate(teammateDto, projectId);
+  }
+
   async confirmInvite(inviteDto, inviteId) {
     return this.userRepository.updateTeammateByInviteId(inviteDto, inviteId);
   }
@@ -24,9 +28,5 @@ export class TeammatesService {
   async deleteTeammate(emailObject: {email: string}) {
     const { email } = emailObject;
     return this.userRepository.deleteTeammate(email);
-  }
-
-  async updateDialogForAllTeammates(projectId, dialogUpdates) {
-    return this.userRepository.updateDialogForAllTeammates(projectId, dialogUpdates);
   }
 }

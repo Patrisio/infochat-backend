@@ -11,6 +11,12 @@ import { TeammatesModule } from './teammates/teammates.module';
 import { InboxGateway } from './inbox.gateway';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ChannelsController } from './channels/channels.controller';
+import { ChannelsModule } from './channels/channels.module';
+import { TemplatesController } from './templates/templates.controller';
+import { TemplatesModule } from './templates/templates.module';
+import { ProjectsController } from './projects/projects.controller';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -35,6 +41,9 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'build'),
     }),
+    ChannelsModule,
+    TemplatesModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway, InboxGateway],

@@ -1,21 +1,18 @@
 import { IsString } from 'class-validator';
 
-export class TeammateDto {
+export class TeammateDataDto {
   @IsString()
-  inviteId: string;
+  username: string;
 
   @IsString()
   email: string;
 
   @IsString()
-  projectId: string;
+  oldEmail: string;
 
   @IsString()
-  role: string;
+  password: string;
 
   @IsString()
-  status: string;
-
-  @IsString()
-  username: string;
+  timezone: string;
 }

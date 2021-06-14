@@ -5,7 +5,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { InviteDto } from '../auth/dto/invite.dto';
 import { TeammateDto } from '../teammates/dto/teammate.dto';
-import { User } from './user.entity';
+import { User } from '../entities/user.entity';
 import { GetUser } from './get-user.decorator';
 
 @Controller('auth')
@@ -26,9 +26,10 @@ export class AuthController {
 
   @Post('/project/:projectId/sendEmail')
   sendEmail(
+    @Param('projectId') projectId,
     @Body() teammateDto: TeammateDto
   ) {
-    return this.authService.sendEmail(teammateDto);
+    return this.authService.sendEmail({ ...teammateDto, projectId });
   }
 
   @Post('/invite/:inviteId')

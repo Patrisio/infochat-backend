@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessagesHistoryRepository } from './messagesHistory.repository';
 import { UserRepository } from '../auth/user.repository';
 import { ChannelRepository } from './channel.repository';
+import { ClientRepository } from './client.repository';
 // import { JwtModule } from '@nestjs/jwt';
 // import { PassportModule } from '@nestjs/passport';
 // import { JwtStrategy } from './jwt.strategy';
@@ -20,7 +21,12 @@ import { AuthModule } from '../auth/auth.module';
   //     },
   //   }),
     AuthModule,
-    TypeOrmModule.forFeature([MessagesHistoryRepository, UserRepository, ChannelRepository])
+    TypeOrmModule.forFeature([
+      MessagesHistoryRepository,
+      UserRepository,
+      ChannelRepository,
+      ClientRepository
+    ])
   ],
   providers: [
     InboxService,

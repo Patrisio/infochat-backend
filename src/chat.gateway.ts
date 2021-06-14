@@ -26,6 +26,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @SubscribeMessage('chatMessage')
   handleMessage(client: Socket, payload: any): void {
+    console.log(payload, '==PAYLAOD++');
     this.server.to(payload.projectId).emit('addIncomingMessage', payload);
     this.server.to(payload.projectId).emit('updateUnreadDialog', payload);
   }
@@ -38,6 +39,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage('joinRoom')
   handleRoomJoin(client: Socket, room: string ) {
     client.join(room);
+  }
+
+  @SubscribeMessage('transferChatSettings')
+  handleTransferChatSettings(client: Socket, payload: {room: string, chatSettings: any}): void {
+    this.server.to(payload.room).emit('transferChatSettingsToChatTrigger', payload.chatSettings);
   }
 
   afterInit(server: Server) {

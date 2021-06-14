@@ -2,14 +2,14 @@ import { IsString } from 'class-validator';
 
 export class ClientDataDto {
   @IsString()
-  assigned_to: string;
+  assigned_to?: string;
 
   @IsString()
-  avatarName: string;
+  avatarName?: string;
 
   @IsString()
-  email: string;
+  email?: string;
 
   @IsString()
-  phone: string;
+  phone?: string;
 }

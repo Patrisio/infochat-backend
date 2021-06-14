@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 
 interface IMessagesHistory {
-  clientId: string,
+  timestamp: number,
   username: string,
   message: string
 }

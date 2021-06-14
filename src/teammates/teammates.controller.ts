@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Res, UseGuards, Param, Get, ValidationPipe, Req, Query, Put, Delete, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { TeammatesService } from './teammates.service';
 import { TeammateDto } from './dto/teammate.dto';
+import { TeammateDataDto } from './dto/teammate-data.dto';
 
 @Controller('teammates')
 export class TeammatesController {
@@ -17,20 +18,21 @@ export class TeammatesController {
 
   @Post('/project/:projectId/settings/teammates/addTeammate')
   addTeammate(
+    @Param('projectId') projectId,
     @Body() teammateDto: TeammateDto
   ) {
-    return this.teammatesService.addTeammate(teammateDto);
+    return this.teammatesService.addTeammate({ ...teammateDto, projectId: parseInt(projectId) });
   }
 
-  @Patch('/project/:projectId/updateDialogForAllTeammates')
-  updateDialogForAllTeammates(
-    @Param('projectId') projectId: string,
-    @Body() dialogUpdates: any
+  @Post('/project/:projectId/settings/teammates/updateTeammate')
+  updateTeammate(
+    @Param('projectId') projectId,
+    @Body() teammateDataDto: TeammateDataDto
   ) {
-    return this.teammatesService.updateDialogForAllTeammates(projectId, dialogUpdates);
+    return this.teammatesService.updateTeammate(teammateDataDto, parseInt(projectId));
   }
 
-  @Delete('/project/:projectId/settings/teammates/deleteTeammate')
+  @Post('/project/:projectId/settings/teammates/deleteTeammate')
   deleteTeammate(
     @Body() emailObject
   ) {

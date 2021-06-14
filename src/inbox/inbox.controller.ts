@@ -8,6 +8,7 @@ import { AssignedDto } from './dto/assigned.dto';
 import { ClientInfoDto } from './dto/client-info.dto';
 import { ClientDataDto } from './dto/client-data.dto';
 import { ChannelDto } from './dto/channel.dto';
+import { MessageStatusDto } from './dto/message-status.dto';
 
 @Controller('inbox')
 export class InboxController {
@@ -28,19 +29,15 @@ export class InboxController {
     @Res() res,
     @Param('projectId') projectId
   ) {
-    console.log('HEREx');
     readFile(
       resolve(__dirname, '..', '..', 'widgets', 'chat.js'),
       'utf8',
       function (err, data) {
-        console.log(data, 'dddd');
         if (err) {
           return console.log(err);
         }
     
         const widgetScriptFile = data.replace(/project_id/g, projectId);
-        console.log('DOWN');
-        console.log(widgetScriptFile);
         res.send(widgetScriptFile);
       }
     );
@@ -56,20 +53,21 @@ export class InboxController {
     return this.inboxService.addMessage(messageDto);
   }
 
+  @Post('project/:projectId/client/:clientId/updateMessagesStatusByClientId')
+  updateMessagesStatusByClientId(
+    @Param('projectId') projectId: string,
+    @Param('clientId') clientId: string,
+    @Body() messagesStatusDto: MessageStatusDto
+  ) {
+    return this.inboxService.updateMessagesStatusByClientId(parseInt(projectId), clientId, messagesStatusDto);
+  }
+
   @Post('/project/:projectId/addChannel')
   addChannel(
     @Body() channel: ChannelDto,
     @Param('projectId') projectId
   ) {
     return this.inboxService.addChannel(channel, parseInt(projectId));
-  }
-
-  @Post('/project/:projectId/updateAssignedUser')
-  updateAssignedUser(
-    @Param('projectId') projectId: string,
-    @Body() assignedDto: AssignedDto
-  ) {
-    return this.inboxService.updateAssignedUser(assignedDto, projectId);
   }
 
   @Post('/project/:projectId/client/:clientId/update')

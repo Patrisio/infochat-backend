@@ -1,7 +1,9 @@
 import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Repository, EntityRepository, getConnection, QueryRunner } from 'typeorm';
-import { Channel } from './channel.entity';
+import { Channel } from '../entities/channel.entity';
 import { ChannelDto } from './dto/channel.dto';
+import { ChatSettingsDto } from '../channels/dto/chat-settings.dto';
+import { ChatSettings } from '../entities/chatSettings.entity';
 
 @EntityRepository(Channel)
 export class ChannelRepository extends Repository<Channel> {

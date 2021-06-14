@@ -2,15 +2,47 @@ import { ConflictException, InternalServerErrorException, NotFoundException } fr
 import { Repository, EntityRepository, Connection, getConnection } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
-import { User } from './user.entity';
-import { Project } from './projects.entity';
+import { TeammateDataDto } from '../teammates/dto/teammate-data.dto';
+import { User } from '../entities/user.entity';
+import { Project } from '../entities/projects.entity';
 import * as bcrypt from 'bcrypt';
-import { ProjectRepository } from './projects.repository';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
   async signUp(authCredentialsDto: AuthCredentialsDto) {
+    console.log('CONTROLLER');
     const { username, phone, email, password, role, status } = authCredentialsDto;
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await this.hashPassword(password, salt);
+
+    // const project = await getConnection()
+    //   .createQueryBuilder()
+    //   .insert()
+    //   .into(Project)
+    //   .values({
+    //     name: 'test_project_name',
+    //   })
+    //   .execute();
+
+    // const projectId = project.raw[0].id;
+
+    // const user = await getConnection()
+    //   .createQueryBuilder()
+    //   .insert()
+    //   .into(User)
+    //   .values({
+    //     username,
+    //     phone,
+    //     email,
+    //     password: hashedPassword,
+    //     salt,
+    //     role,
+    //     status,
+    //   })
+    //   .execute();
+
+
     const user = new User();
     const project = new Project();
     
@@ -19,24 +51,24 @@ export class UserRepository extends Repository<User> {
     user.email = email;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
-    // user.project_id = this.between(100000, 999999);
     user.role = role;
     user.status = status;
-
+    
     try {
       project.name = 'project_name333';
-      const projectData = await project.save();
-      user.project_id = projectData.id;
+      await user.save();
+      console.log(project.users, 'project.users');
+      project.users = [user];
 
+      const projectData = await project.save();
+      user.projects = [project];
       await user.save();
 
-      project.users =[user];
-      await project.save();
-
+      console.log(projectData, 'DATA');
       return {
         code: 200,
         status: 'success',
-        projectId: String(projectData.id)
+        projectId: projectData.id
       };
     } catch (error) {
       if (error.code === '23505') {
@@ -48,18 +80,8 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async validateUserPassword(loginCredentialsDto: LoginCredentialsDto): Promise<{ projectId: number, email: string }> {
-    const { email, password } = loginCredentialsDto;
-    const user = await this.findOne({ email });
-
-    if (user && await user.validatePassword(password)) {
-      return {
-        projectId: user.project_id,
-        email: user.email
-      };
-    } else {
-      return null;
-    }
+  async validateUserPassword(password: string, user: User): Promise<Boolean> {
+    return await user.validatePassword(password);
   }
 
   async getTeammatesByProjectId(projectId) {
@@ -67,24 +89,45 @@ export class UserRepository extends Repository<User> {
     const projectRepository = await getConnection().getRepository(Project);
     const projects = await projectRepository.find({ relations: ["users"] });
     const project = projects.find((project) => project.id === parseInt(projectId));
-    console.log(project)
     const teammates = project.users;
     const formattedTeammates = [];
 
-    for (let { id, username, email, status, role,
-      all_client_ids, unread_count, unread_client_ids,
-      assigned_count, assigned_client_ids,
-      opened_count, opened_client_ids } of teammates) {
+    for (let { id, username, email, status, role } of teammates) {
       const operator = {
-        id, username, email, status, role, 
-        all_client_ids, unread_count, unread_client_ids,
-        assigned_count, assigned_client_ids,
-        opened_count, opened_client_ids 
+        id, username, email, status, role
       };
       formattedTeammates.push(operator);
     }
 
     return formattedTeammates;
+  }
+
+  async updateTeammate(teammateDto: TeammateDataDto, projectId: number) {
+    const { password, oldEmail, ...updatedTeammateData } = teammateDto;
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await this.hashPassword(password, salt);
+
+    try {
+      await getConnection()
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          ...updatedTeammateData,
+          salt,
+          password: hashedPassword,
+        })
+        .where('email = :oldEmail', { oldEmail })
+        .execute();
+
+      return {
+        code: 200,
+        status: 'success',
+      }
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async addTeammate(teammateDto) {
@@ -97,7 +140,6 @@ export class UserRepository extends Repository<User> {
     const project = projects.find((project) => project.id === parseInt(projectId));
 
     user.invite_id = inviteId;
-    user.project_id = parseInt(projectId);
     user.email = email;
     user.role = role;
     user.status = status;
@@ -105,10 +147,15 @@ export class UserRepository extends Repository<User> {
 
     try {
       await user.save();
+
+      const users = await this.find({ relations: ["projects"] });
+      const foundUser = users.find((user) => user.email === email);
       
       project.users = [...project.users, user];
       project.save();
-
+      foundUser.projects = [...foundUser.projects, project];
+      await user.save();
+      console.log(foundUser.projects, 'user.projects');
       return {
         code: 200,
         status: 'success'
@@ -130,7 +177,7 @@ export class UserRepository extends Repository<User> {
     const projects = await projectRepository.find({ relations: ["users"] });
     const project = projects.find((project) => project.id === parseInt(projectId));
 
-    const user = await this.findOne({ project_id: parseInt(projectId), email });
+    const user = await this.findOne({ email });
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
     user.username = username;
@@ -164,121 +211,35 @@ export class UserRepository extends Repository<User> {
   }
 
   async getCurrentUser(email: string) {
-    const {
-      all_client_ids, unread_count, unread_client_ids,
-      assigned_count, assigned_client_ids,
-      opened_count, opened_client_ids,
-      username, phone, role, status, closed_count, closed_client_ids
-    } = await this.findOne({ email });
+    const users = await this.find({ relations: ["projects"] });
+    const { username, phone, role, status, timezone, projects } = users.find((user) => user.email === email);
+    const resultProjects = [];
+
+    for (let i = 0; i < projects.length; i++) {
+      const project = projects[i];
+
+      project.users = await getConnection()
+        .createQueryBuilder()
+        .relation(Project, 'users')
+        .of(project)
+        .loadMany();
+
+      resultProjects.push({
+        id: project.id,
+        name: project.name,
+        teammatesCount: project.users.length,
+      });
+    }
 
     return {
-      allClientIds: all_client_ids,
-      unreadCount: unread_count,
-      unreadClientIds: unread_client_ids,
-      assignedCount: assigned_count,
-      assignedClientIds: assigned_client_ids,
-      openedCount: opened_count,
-      openedClientIds: opened_client_ids,
-      closedCount: closed_count,
-      closedClientIds: closed_client_ids,
       username,
       phone,
       role, 
       status,
-      email
+      email,
+      timezone,
+      projects: resultProjects,
     };
-  }
-
-  async updateDialogForAllTeammates(projectId: any, dialogUpdates: any) {
-    try {
-      await getConnection()
-        .createQueryBuilder()
-        .update(User)
-        .set({
-          unread_count: dialogUpdates.unreadCount,
-          unread_client_ids: dialogUpdates.unreadClientIds
-        })
-        .where("project_id = :project_id", { project_id: parseInt(projectId) })
-        .execute();
-
-      return {
-        code: 200,
-        status: 'success'
-      };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async updateOpenedDialogForAllTeammates(projectId: any, dialogUpdates: any) {
-    try {
-      await getConnection()         
-        .createQueryBuilder()
-        .update(User) 
-        .set({
-          opened_count: dialogUpdates.openedCount,
-          opened_client_ids: dialogUpdates.openedClientIds
-        })
-        .where("project_id = :project_id", { project_id: parseInt(projectId) })
-        .execute();
-
-      return {
-        code: 200,
-        status: 'success'
-      };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async updateAssignedUserByEmail(assignedDto) {
-    const { email, assignedClientIds, assignedCount } = assignedDto;
-
-    try {
-      await getConnection()
-        .createQueryBuilder()
-        .update(User)
-        .set({
-          assigned_count: assignedCount,
-          assigned_client_ids: assignedClientIds
-        })
-        .where("email = :email", { email })
-        .execute();
-
-        return {
-        code: 200,
-        status: 'success'
-      };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async updateClosedUserByEmail(assignedDto) {
-    const { email, closedClientIds, closedCount } = assignedDto;
-
-    try {
-      await getConnection()
-        .createQueryBuilder()
-        .update(User)
-        .set({
-          closed_count: closedCount,
-          closed_client_ids: closedClientIds
-        })
-        .where("email = :email", { email })
-        .execute();
-
-        return {
-          code: 200,
-          status: 'success'
-        };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
-    }
   }
 
   private async hashPassword(password: string, salt: string) {

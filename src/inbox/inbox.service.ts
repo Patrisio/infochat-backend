@@ -3,11 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MessagesHistoryRepository } from './messagesHistory.repository';
 import { ChannelRepository } from './channel.repository';
 import { UserRepository } from '../auth/user.repository';
+import { ClientRepository } from './client.repository';
 import { MessageDto } from './dto/message.dto';
 import { ClientDto } from './dto/client.dto';
 import { ClientInfoDto } from './dto/client-info.dto';
 import { ClientDataDto } from './dto/client-data.dto';
 import { ChannelDto } from './dto/channel.dto';
+import { MessageStatusDto } from './dto/message-status.dto';
 
 @Injectable()
 export class InboxService {
@@ -17,11 +19,30 @@ export class InboxService {
     @InjectRepository(UserRepository)
     private userRepository: UserRepository,
     @InjectRepository(ChannelRepository)
-    private channelRepository: ChannelRepository
+    private channelRepository: ChannelRepository,
+    @InjectRepository(ClientRepository)
+    private clientRepository: ClientRepository
   ) {}
 
-  async addMessage(messageDto: MessageDto): Promise<{code: number, status: string}> {
-    return this.messagesHistoryRepository.addMessage(messageDto);
+  async addMessage(messageDto: MessageDto) {
+    const { clientId, projectId, message, avatarName, avatarColor } = messageDto;
+    const historyMessage = await this.clientRepository.findDuplicateByClientId(clientId);
+
+    if (historyMessage) {
+      await this.messagesHistoryRepository.addMessage(message, clientId);
+    } else {
+      await this.clientRepository.addClientData(messageDto);
+      await this.messagesHistoryRepository.addMessage(message, clientId);
+    }
+
+    return {
+      code: 200,
+      status: 'success'
+    };
+  }
+
+  async updateMessagesStatusByClientId(projectId: number, clientId: string, messagesStatusDto: MessageStatusDto) {
+    return await this.clientRepository.updateMessagesStatusByClientId(projectId, clientId, messagesStatusDto);
   }
 
   async getMessagesHistory(clientDto) {
@@ -29,40 +50,15 @@ export class InboxService {
   }
 
   async getMessagesHistoryByProjectId(projectId) {
-    return this.messagesHistoryRepository.getMessagesHistoryByProjectId(projectId);
-  }
-
-  async updateAssignedUser(assignedDto, projectId) {
-    const { unreadClientIds, unreadCount, openedClientIds, openedCount } = assignedDto;
-
-    const messageHistoryResponse = await this.messagesHistoryRepository.updateAssignedUserByClientId(assignedDto);
-    const userResponse = await this.userRepository.updateAssignedUserByEmail(assignedDto);
-    const unreadResponse = await this.userRepository.updateDialogForAllTeammates(projectId, { unreadClientIds, unreadCount });
-    const openedResponse = await this.userRepository.updateOpenedDialogForAllTeammates(projectId, { openedClientIds, openedCount });
-    const closedResponse = await this.userRepository.updateClosedUserByEmail(assignedDto);
-
-    if (
-      messageHistoryResponse.code === 200 &&
-      userResponse.code === 200 &&
-      unreadResponse.code === 200 &&
-      openedResponse.code === 200 &&
-      closedResponse.code === 200) 
-    {
-      return {
-        code: 200,
-        status: 'success'
-      };
-    }
-    
-    throw new InternalServerErrorException();
+    return this.clientRepository.getMessagesHistoryByProjectId(projectId);
   }
 
   async getClientInfo(projectId: number, clientId: string) {
-    return this.messagesHistoryRepository.getClientInfo(projectId, clientId);
+    return this.clientRepository.getClientInfo(projectId, clientId);
   }
 
   async update(projectId: number, clientId: string, assigned_to: ClientDataDto) {
-    return this.messagesHistoryRepository.updateClientData(projectId, clientId, assigned_to);
+    return this.clientRepository.updateClientData(projectId, clientId, assigned_to);
   }
 
   async addChannel(channel: ChannelDto, projectId: number) {
