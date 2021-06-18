@@ -38,6 +38,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   salt: string;
 
+  @Column({ nullable: true })
+  balance: number;
+
   // @Column()
   // project_id: number;
 
@@ -52,9 +55,6 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   timezone: string;
-
-  // @OneToMany(() => Project, project => project.user)
-  // project: Project[];
 
   async validatePassword(password: string): Promise<Boolean> {
     const hash = await bcrypt.hash(password, this.salt);

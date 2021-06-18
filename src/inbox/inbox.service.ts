@@ -4,6 +4,7 @@ import { MessagesHistoryRepository } from './messagesHistory.repository';
 import { ChannelRepository } from './channel.repository';
 import { UserRepository } from '../auth/user.repository';
 import { ClientRepository } from './client.repository';
+import { ChangesHistoryRepository } from './changesHistory.repository';
 import { MessageDto } from './dto/message.dto';
 import { ClientDto } from './dto/client.dto';
 import { ClientInfoDto } from './dto/client-info.dto';
@@ -21,11 +22,13 @@ export class InboxService {
     @InjectRepository(ChannelRepository)
     private channelRepository: ChannelRepository,
     @InjectRepository(ClientRepository)
-    private clientRepository: ClientRepository
+    private clientRepository: ClientRepository,
+    @InjectRepository(ChangesHistoryRepository)
+    private changesHistoryRepository: ChangesHistoryRepository
   ) {}
 
   async addMessage(messageDto: MessageDto) {
-    const { clientId, projectId, message, avatarName, avatarColor } = messageDto;
+    const { clientId, message } = messageDto;
     const historyMessage = await this.clientRepository.findDuplicateByClientId(clientId);
 
     if (historyMessage) {
@@ -57,8 +60,19 @@ export class InboxService {
     return this.clientRepository.getClientInfo(projectId, clientId);
   }
 
-  async update(projectId: number, clientId: string, assigned_to: ClientDataDto) {
-    return this.clientRepository.updateClientData(projectId, clientId, assigned_to);
+  async update(projectId: number, clientId: string, clientDataDto: ClientDataDto) {
+    try {
+      await this.changesHistoryRepository.addChanges(projectId, clientId, clientDataDto);
+      await this.clientRepository.updateClientData(projectId, clientId, clientDataDto);
+
+      return {
+        code: 200,
+        status: 'success'
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async addChannel(channel: ChannelDto, projectId: number) {

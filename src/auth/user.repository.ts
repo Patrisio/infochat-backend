@@ -23,6 +23,7 @@ export class UserRepository extends Repository<User> {
     user.password = await this.hashPassword(password, user.salt);
     user.role = role;
     user.status = status;
+    user.balance = 0;
     
     try {
       project.name = 'project_name333';
@@ -180,7 +181,7 @@ export class UserRepository extends Repository<User> {
 
   async getCurrentUser(email: string) {
     const users = await this.find({ relations: ["projects"] });
-    const { username, phone, role, status, timezone, projects } = users.find((user) => user.email === email);
+    const { username, phone, role, status, timezone, projects, balance } = users.find((user) => user.email === email);
     const resultProjects = [];
 
     for (let i = 0; i < projects.length; i++) {
@@ -206,6 +207,7 @@ export class UserRepository extends Repository<User> {
       status,
       email,
       timezone,
+      balance,
       projects: resultProjects,
     };
   }

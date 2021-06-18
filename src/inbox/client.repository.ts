@@ -4,6 +4,8 @@ import { Client } from '../entities/client.entity';
 import { cloneDeep } from 'lodash';
 import { MessageStatusDto } from './dto/message-status.dto';
 import { ClientDataDto } from './dto/client-data.dto';
+import { executionAsyncResource } from 'async_hooks';
+import { ChangesHistory } from 'src/entities/changesHistory.entity';
 
 @EntityRepository(Client)
 export class ClientRepository extends Repository<Client> {
@@ -13,10 +15,25 @@ export class ClientRepository extends Repository<Client> {
 
   async getClientInfo(projectId, clientId) {
     const client = await this.findOne({ project: projectId, id: clientId });
+    // const client = await this.find({ relations: ['changesHistory'] } });
+    console.log(client);
+
+    const changesHistory = await getConnection()
+      .createQueryBuilder()
+      .select('before, after, timestamp')
+      .from(ChangesHistory, 'changesHistory')
+      .where('client_id = :clientId', { clientId })
+      .execute();
+
+    for (let i = 0; i < changesHistory.length; i++) {
+      const changesHistoryItem = changesHistory[i];
+      changesHistoryItem.timestamp = Date.parse(changesHistoryItem.timestamp);
+    }
 
     if (client) {
       return {
-        assignedTo: client.assignedTo,
+        changesHistory,
+        notes: [],
       };
     }
   }
@@ -24,7 +41,7 @@ export class ClientRepository extends Repository<Client> {
   async getMessagesHistoryByProjectId(projectId) {
     const data = await getConnection()
       .query(`
-        SELECT client.id, client."assignedTo", "messagesStatus", "avatarName", "avatarColor", messages_history.client_id, messages_history.message, messages_history.username,  messages_history.timestamp 
+        SELECT client.id, client."assignedTo", client.email, client.phone, "messagesStatus", "avatarName", "avatarColor", messages_history.client_id, messages_history.message, messages_history.username,  messages_history.timestamp 
         FROM client
         JOIN messages_history ON client.id = messages_history.client_id
         WHERE project_id = $1
@@ -46,6 +63,8 @@ export class ClientRepository extends Repository<Client> {
       acc.push({
         clientId: client.id,
         assignedTo: client.assignedTo,
+        email: client.email,
+        phone: client.phone,
         avatarName: client.avatarName,
         avatarColor: client.avatarColor,
         messagesStatus: client.messagesStatus,
@@ -108,6 +127,7 @@ export class ClientRepository extends Repository<Client> {
 
   async updateClientData(projectId: number, clientId: string, clientDataDto: ClientDataDto) {
     try {
+      console.log(clientDataDto);
       await getConnection()
         .createQueryBuilder()
         .update(Client)
