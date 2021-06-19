@@ -7,6 +7,7 @@ import { UserRepository } from '../auth/user.repository';
 import { ChannelRepository } from './channel.repository';
 import { ClientRepository } from './client.repository';
 import { ChangesHistoryRepository } from './changesHistory.repository';
+import { NoteRepository } from './note.repository';
 // import { JwtModule } from '@nestjs/jwt';
 // import { PassportModule } from '@nestjs/passport';
 // import { JwtStrategy } from './jwt.strategy';
@@ -28,6 +29,7 @@ import { AuthModule } from '../auth/auth.module';
       ChannelRepository,
       ClientRepository,
       ChangesHistoryRepository,
+      NoteRepository,
     ])
   ],
   providers: [

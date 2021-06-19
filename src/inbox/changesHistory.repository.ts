@@ -5,24 +5,30 @@ import { Client } from '../entities/client.entity';
 
 @EntityRepository(ChangesHistory)
 export class ChangesHistoryRepository extends Repository<ChangesHistory> {
-  async getMessagesHistory(clientDto) {
-    // const data = await getConnection()
-    //   .query(`
-    //     SELECT client.id, client."assignedTo", "avatarName", "avatarColor", messages_history.client_id, messages_history.message, messages_history.username 
-    //     FROM client
-    //     JOIN messages_history ON client.id = messages_history.client_id
-    //     WHERE project_id = $1 AND client.id = $2
-    //   `, [clientDto.projectId, clientDto.clientId]);
+  async getChangesHistory(clientId: string) {
+    try {
+      const changesHistory = await getConnection()
+        .createQueryBuilder()
+        .select('before, after, "changeInFieldValue", timestamp')
+        .from(ChangesHistory, 'changesHistory')
+        .where('client_id = :clientId', { clientId })
+        .execute();
 
-    // return {
-    //   id: null,
-    //   clientId: '',
-    //   projectId: '',
-    //   messagesHistory: data
-    // };
+      for (let i = 0; i < changesHistory.length; i++) {
+        const changesHistoryItem = changesHistory[i];
+        changesHistoryItem.timestamp = Date.parse(changesHistoryItem.timestamp);
+      }
+
+      return changesHistory;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async addChanges(projectId, clientId, clientDataDto) {
+    const { updatedBy } = clientDataDto;
+
     function isUndefined(value) {
       return value === undefined
     }
@@ -35,6 +41,7 @@ export class ChangesHistoryRepository extends Repository<ChangesHistory> {
     const newEmail = clientDataDto.email;
     const newPhone = clientDataDto.phone;
     const newAvatarName = clientDataDto.avatarName;
+    const changeInFieldValue = clientDataDto.changeInFieldValue;
 
     const insertNewChange = async (oldFieldValue: string, newFieldValue: string) => {
       try {
@@ -46,6 +53,7 @@ export class ChangesHistoryRepository extends Repository<ChangesHistory> {
             before: oldFieldValue,
             after: newFieldValue,
             client: clientId,
+            changeInFieldValue,
           })
           .execute();
         
@@ -58,20 +66,23 @@ export class ChangesHistoryRepository extends Repository<ChangesHistory> {
         throw new InternalServerErrorException();
       }
     };
-    console.log(newEmail, email, !isEqual(newEmail, email));
-    if (email && !isEqual(newEmail, email)) {
-      console.log(111);
-      await insertNewChange(email, newEmail);
-    }
 
-    if (phone && !isEqual(newPhone, phone)) {
-      console.log(222);
-      await insertNewChange(phone, newPhone);
-    }
-
-    if (newAvatarName && avatarName && !isEqual(newAvatarName, avatarName)) {
-      console.log(333);
-      await insertNewChange(avatarName, newAvatarName);
+    if (updatedBy === 'client') return;
+    if (updatedBy === 'operator') {
+      if (!isEqual(newEmail, email)) {
+        console.log(111);
+        await insertNewChange(email, newEmail);
+      }
+  
+      if (!isEqual(newPhone, phone)) {
+        console.log(222);
+        await insertNewChange(phone, newPhone);
+      }
+  
+      if (!isEqual(newAvatarName, avatarName)) {
+        console.log(333);
+        await insertNewChange(avatarName, newAvatarName);
+      }
     }
   }
 }

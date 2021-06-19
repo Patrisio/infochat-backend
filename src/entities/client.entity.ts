@@ -2,6 +2,7 @@ import { BaseEntity, Entity, PrimaryGeneratedColumn, PrimaryColumn, Column, OneT
 import { MessagesHistory } from './messagesHistory.entity';
 import { Project } from './projects.entity';
 import { ChangesHistory } from './changesHistory.entity';
+import { Note } from './note.entity';
 
 type MessagesStatus = 'unread' | 'assigned' | 'opened' | 'closed';
 
@@ -39,4 +40,7 @@ export class Client extends BaseEntity {
 
   @OneToMany(() => ChangesHistory, changesHistory => changesHistory.client)
   changesHistory: ChangesHistory[];
+
+  @OneToMany(() =>  Note, note => note.client)
+  note: Note[];
 }

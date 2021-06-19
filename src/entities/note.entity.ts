@@ -2,23 +2,20 @@ import { BaseEntity, Entity, PrimaryGeneratedColumn, PrimaryColumn, Column, OneT
 import { Client } from './client.entity';
 
 @Entity()
-export class ChangesHistory extends BaseEntity {
+export class Note extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
-  before: string;
+  @Column()
+  text: string;
 
   @Column()
-  after: string;
-
-  @Column()
-  changeInFieldValue: string;
+  madeBy: string;
 
   @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
   timestamp: Date
 
-  @ManyToOne(() => Client, client => client.changesHistory)
+  @ManyToOne(() => Client, client => client.note)
   @JoinColumn([
     { name: "client_id", referencedColumnName: "id" },
   ])

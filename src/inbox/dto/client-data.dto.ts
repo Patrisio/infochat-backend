@@ -2,7 +2,10 @@ import { IsString } from 'class-validator';
 
 export class ClientDataDto {
   @IsString()
-  assigned_to?: string;
+  updatedBy: string;
+
+  @IsString()
+  assignedTo?: string;
 
   @IsString()
   avatarName?: string;

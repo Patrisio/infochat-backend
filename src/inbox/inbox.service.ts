@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MessagesHistoryRepository } from './messagesHistory.repository';
 import { ChannelRepository } from './channel.repository';
 import { UserRepository } from '../auth/user.repository';
+import { NoteRepository } from './note.repository';
 import { ClientRepository } from './client.repository';
 import { ChangesHistoryRepository } from './changesHistory.repository';
 import { MessageDto } from './dto/message.dto';
@@ -11,6 +12,7 @@ import { ClientInfoDto } from './dto/client-info.dto';
 import { ClientDataDto } from './dto/client-data.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { MessageStatusDto } from './dto/message-status.dto';
+import { NoteDataDto } from './dto/note-data.dto';
 
 @Injectable()
 export class InboxService {
@@ -24,7 +26,9 @@ export class InboxService {
     @InjectRepository(ClientRepository)
     private clientRepository: ClientRepository,
     @InjectRepository(ChangesHistoryRepository)
-    private changesHistoryRepository: ChangesHistoryRepository
+    private changesHistoryRepository: ChangesHistoryRepository,
+    @InjectRepository(NoteRepository)
+    private noteRepository: NoteRepository
   ) {}
 
   async addMessage(messageDto: MessageDto) {
@@ -57,7 +61,17 @@ export class InboxService {
   }
 
   async getClientInfo(projectId: number, clientId: string) {
-    return this.clientRepository.getClientInfo(projectId, clientId);
+    try {
+      const changesHistory = await this.changesHistoryRepository.getChangesHistory(clientId);
+      const notes = await this.noteRepository.getNotes(clientId);
+      return {
+        changesHistory,
+        notes,
+      }
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async update(projectId: number, clientId: string, clientDataDto: ClientDataDto) {
@@ -81,5 +95,13 @@ export class InboxService {
 
   async getChannels(projectId: number) {
     return this.channelRepository.getChannels(projectId);
+  }
+
+  async addNote(clientId: string, noteDataDto: NoteDataDto) {
+    return this.noteRepository.addNote(clientId, noteDataDto);
+  }
+
+  async deleteNote(noteId: number) {
+    return this.noteRepository.deleteNote(noteId);
   }
 }

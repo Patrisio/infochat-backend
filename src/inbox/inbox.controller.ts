@@ -9,6 +9,7 @@ import { ClientInfoDto } from './dto/client-info.dto';
 import { ClientDataDto } from './dto/client-data.dto';
 import { ChannelDto } from './dto/channel.dto';
 import { MessageStatusDto } from './dto/message-status.dto';
+import { NoteDataDto } from './dto/note-data.dto';
 
 @Controller('inbox')
 export class InboxController {
@@ -77,6 +78,21 @@ export class InboxController {
     @Body() clientData: ClientDataDto
   ) {
     return this.inboxService.update(parseInt(projectId), clientId, clientData);
+  }
+
+  @Post('/client/:clientId/addNote')
+  addNote(
+    @Param('clientId') clientId: string,
+    @Body() noteData: NoteDataDto
+  ) {
+    return this.inboxService.addNote( clientId, noteData);
+  }
+
+  @Post('/client/:clientId/deleteNote')
+  deleteNote(
+    @Body() id: { id: number }
+  ) {
+    return this.inboxService.deleteNote(id.id);
   }
 
   @Get('project/:projectId/client/:clientId/getClientInfo')

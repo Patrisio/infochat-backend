@@ -15,8 +15,6 @@ export class ClientRepository extends Repository<Client> {
 
   async getClientInfo(projectId, clientId) {
     const client = await this.findOne({ project: projectId, id: clientId });
-    // const client = await this.find({ relations: ['changesHistory'] } });
-    console.log(client);
 
     const changesHistory = await getConnection()
       .createQueryBuilder()
@@ -126,12 +124,23 @@ export class ClientRepository extends Repository<Client> {
   }
 
   async updateClientData(projectId: number, clientId: string, clientDataDto: ClientDataDto) {
+    const {
+      avatarName,
+      email,
+      phone,
+      assignedTo
+    } = clientDataDto;
     try {
       console.log(clientDataDto);
       await getConnection()
         .createQueryBuilder()
         .update(Client)
-        .set(clientDataDto)
+        .set({
+          avatarName,
+          email,
+          phone,
+          assignedTo
+        })
         .where('project_id = :projectId AND id = :clientId', { projectId, clientId })
         .execute();
 
