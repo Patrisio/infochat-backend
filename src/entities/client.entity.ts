@@ -29,6 +29,9 @@ export class Client extends BaseEntity {
   @Column()
   messagesStatus: MessagesStatus;
 
+  @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
+  createdAt: Date
+
   @ManyToOne(() => Project, project => project.client)
   @JoinColumn([
     { name: "project_id", referencedColumnName: "id" },

@@ -33,6 +33,11 @@ export class InboxGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     client.broadcast.emit('updateAssignedToAnybody', payload);
   }
 
+  @SubscribeMessage('updateTeammateOnlineStatus')
+  updateTeammateOnlineStatus(client: Socket, payload: any): void {
+    client.broadcast.emit('updateTeammateOnlineStatus', payload);
+  }
+
   afterInit(server: Server) {
     this.logger.log('Init');
   }

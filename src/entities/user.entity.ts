@@ -2,18 +2,6 @@ import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, ManyToMany,
 import * as bcrypt from 'bcrypt';
 import { Project } from './projects.entity';
 
-type IClient = {
-  projectId: string,
-  clientId: string,
-  messagesHistory: IMessagesHistory[],
-}
-
-type IMessagesHistory = {
-  clientId: string,
-  username: string,
-  message: string
-}
-
 @Entity()
 @Unique(['email'])
 export class User extends BaseEntity {
@@ -41,17 +29,14 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   balance: number;
 
-  // @Column()
-  // project_id: number;
-
-  @Column({ nullable: true })
-  invite_id: string;
-
   @Column()
   role: string;
 
   @Column()
   status: string;
+
+  @Column({ default: false })
+  isOnline: boolean;
 
   @Column({ nullable: true })
   timezone: string;
@@ -61,6 +46,3 @@ export class User extends BaseEntity {
     return hash === this.password;
   }
 }
-
-// @Column("text", { array: true, default: "{}" })
-// closed_client_ids: string[];

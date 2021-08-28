@@ -54,16 +54,15 @@ export class UserRepository extends Repository<User> {
   }
 
   async getTeammatesByProjectId(projectId) {
-    // const teammates = await this.find({ project_id: projectId });
     const projectRepository = await getConnection().getRepository(Project);
     const projects = await projectRepository.find({ relations: ["users"] });
     const project = projects.find((project) => project.id === parseInt(projectId));
     const teammates = project.users;
     const formattedTeammates = [];
 
-    for (let { id, username, email, status, role } of teammates) {
+    for (let { id, username, email, status, role, isOnline } of teammates) {
       const operator = {
-        id, username, email, status, role
+        id, username, email, status, role, isOnline,
       };
       formattedTeammates.push(operator);
     }
@@ -73,19 +72,24 @@ export class UserRepository extends Repository<User> {
 
   async updateTeammate(teammateDto: TeammateDataDto, projectId: number) {
     const { password, oldEmail, ...updatedTeammateData } = teammateDto;
+    let teammateData: any = updatedTeammateData;
 
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await this.hashPassword(password, salt);
+    if (password) {
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await this.hashPassword(password, salt);
 
+      teammateData = {
+        ...teammateData,
+        salt,
+        password: hashedPassword,
+      };
+    }
+    
     try {
       await getConnection()
         .createQueryBuilder()
         .update(User)
-        .set({
-          ...updatedTeammateData,
-          salt,
-          password: hashedPassword,
-        })
+        .set(teammateData)
         .where('email = :oldEmail', { oldEmail })
         .execute();
 
@@ -100,7 +104,7 @@ export class UserRepository extends Repository<User> {
   }
 
   async addTeammate(teammateDto) {
-    const { inviteId, projectId, email, role, status, username } = teammateDto;
+    const { projectId, email, role, status, username } = teammateDto;
 
     const user = new User();
 
@@ -108,7 +112,6 @@ export class UserRepository extends Repository<User> {
     const projects = await projectRepository.find({ relations: ["users"] });
     const project = projects.find((project) => project.id === parseInt(projectId));
 
-    user.invite_id = inviteId;
     user.email = email;
     user.role = role;
     user.status = status;
@@ -181,7 +184,10 @@ export class UserRepository extends Repository<User> {
 
   async getCurrentUser(email: string) {
     const users = await this.find({ relations: ["projects"] });
-    const { username, phone, role, status, timezone, projects, balance } = users.find((user) => user.email === email);
+    const {
+      username, phone, role, status,
+      timezone, projects, balance, isOnline,
+    } = users.find((user) => user.email === email);
     const resultProjects = [];
 
     for (let i = 0; i < projects.length; i++) {
@@ -208,6 +214,7 @@ export class UserRepository extends Repository<User> {
       email,
       timezone,
       balance,
+      isOnline,
       projects: resultProjects,
     };
   }
