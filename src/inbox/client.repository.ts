@@ -39,7 +39,7 @@ export class ClientRepository extends Repository<Client> {
   async getMessagesHistoryByProjectId(projectId) {
     const data = await getConnection()
       .query(`
-        SELECT client.id, client."assignedTo", client.email, client.phone, "messagesStatus", "avatarName", "avatarColor", messages_history.client_id, messages_history.message, messages_history.username,  messages_history.timestamp 
+        SELECT client.id, client."isBlocked", client."assignedTo", client.email, client.phone, "messagesStatus", "avatarName", "avatarColor", messages_history.client_id, messages_history.message, messages_history.username,  messages_history.timestamp 
         FROM client
         JOIN messages_history ON client.id = messages_history.client_id
         WHERE project_id = $1
@@ -60,6 +60,7 @@ export class ClientRepository extends Repository<Client> {
 
       acc.push({
         clientId: client.id,
+        isBlocked: client.isBlocked,
         assignedTo: client.assignedTo,
         email: client.email,
         phone: client.phone,
@@ -128,7 +129,8 @@ export class ClientRepository extends Repository<Client> {
       avatarName,
       email,
       phone,
-      assignedTo
+      assignedTo,
+      isBlocked,
     } = clientDataDto;
     try {
       console.log(clientDataDto);
@@ -139,7 +141,8 @@ export class ClientRepository extends Repository<Client> {
           avatarName,
           email,
           phone,
-          assignedTo
+          assignedTo,
+          isBlocked,
         })
         .where('project_id = :projectId AND id = :clientId', { projectId, clientId })
         .execute();

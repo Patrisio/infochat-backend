@@ -41,7 +41,7 @@
 
     const getChatWindowAttributes = (projectId, clientId) => {
       return {
-        'src': `http://localhost:3000/project/${projectId}/iframe/${clientId}`,
+        'src': `http://localhost:3001/project/${projectId}/iframe/${clientId}`,
         'name': 'blyak_chat',
         'id': 'chatWindow',
         'width': '350',
@@ -52,7 +52,7 @@
 
     const getChatTriggerAttributes = (projectId, clientId) => {
       return {
-        'src': `http://localhost:3000/project/${projectId}/iframe/${clientId}/chatTrigger`,
+        'src': `http://localhost:3001/project/${projectId}/iframe/${clientId}/chatTrigger`,
         'name': 'chat_trigger',
         'id': 'chatTrigger',
         'width': '50',
@@ -168,6 +168,12 @@
           localStorageRulesSteps: localStorage.getItem('rulesSteps')
         }, 'http://localhost:3000');
         break;
+      case 'closeChatWindowIframe':
+        const chatWindowIframeNode = document.getElementById('chatWindow');
+        const chatTriggerIframeNode = document.getElementById('chatTrigger');
+
+        chatWindowIframeNode.remove();
+        chatTriggerIframeNode.remove();
     }
   };
 

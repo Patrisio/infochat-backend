@@ -46,6 +46,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server.to(payload.room).emit('transferChatSettingsToChatTrigger', payload.chatSettings);
   }
 
+  @SubscribeMessage('blockClient')
+  blockOrUnblockClient(client: Socket, payload: { room: string }): void {
+    this.server.to(payload.room).emit('blockClient');
+  }
+
   afterInit(server: Server) {
     this.logger.log('Init');
   }

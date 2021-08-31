@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsBoolean } from 'class-validator';
 
 export class ClientDataDto {
   @IsString()
@@ -15,4 +15,7 @@ export class ClientDataDto {
 
   @IsString()
   phone?: string;
+
+  @IsBoolean()
+  isBlocked?: boolean;
 }

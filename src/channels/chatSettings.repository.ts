@@ -5,7 +5,6 @@ import { ChatSettingsRule } from '../entities/chatSettingsRule.entity';
 import { ChatSettingsCondition } from '../entities/chatSettingsCondition.entity';
 import { ChatSettingsOperator } from '../entities/chatSettingsOperator.entity';
 import { ChatSettingsBusinessDays } from '../entities/chatSettingsBusinessDays.entity';
-import { Project } from '../entities/projects.entity';
 import { Channel } from '../entities/channel.entity';
 import { ChatSettingsDto } from './dto/chat-settings.dto';
 
@@ -352,7 +351,7 @@ export class ChatSettingsRepository extends Repository<ChatSettings> {
       ...generalChatSettings,
       businessDays,
       operators: formattedOperators,
-      rules
+      rules,
     };
   }
 }

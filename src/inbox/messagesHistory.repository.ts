@@ -1,10 +1,28 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { Repository, EntityRepository, getConnection } from 'typeorm';
 import { MessagesHistory } from '../entities/messagesHistory.entity';
+import { Client } from '../entities/client.entity';
 
 @EntityRepository(MessagesHistory)
 export class MessagesHistoryRepository extends Repository<MessagesHistory> {
   async getMessagesHistory(clientDto) {
+    const { isBlocked } = await getConnection()
+      .createQueryBuilder()
+      .select(`"isBlocked"`)
+      .from(Client, 'client')
+      .where('id = :clientId', { clientId: clientDto.clientId })
+      .getRawOne();
+    
+    if (isBlocked) {
+      return {
+        id: null,
+        clientId: '',
+        projectId: '',
+        messagesHistory: [],
+        isBlocked,
+      };
+    }
+
     const data = await getConnection()
       .query(`
         SELECT client.id, client."assignedTo", "avatarName", "avatarColor", messages_history.client_id, messages_history.message, messages_history.username 
@@ -17,7 +35,8 @@ export class MessagesHistoryRepository extends Repository<MessagesHistory> {
       id: null,
       clientId: '',
       projectId: '',
-      messagesHistory: data
+      messagesHistory: data,
+      isBlocked,
     };
   }
 

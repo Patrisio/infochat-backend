@@ -29,6 +29,9 @@ export class Client extends BaseEntity {
   @Column()
   messagesStatus: MessagesStatus;
 
+  @Column({ default: false })
+  isBlocked: boolean;
+
   @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
   createdAt: Date
 
