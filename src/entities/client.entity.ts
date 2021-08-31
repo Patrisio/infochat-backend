@@ -35,18 +35,18 @@ export class Client extends BaseEntity {
   @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
   createdAt: Date
 
-  @ManyToOne(() => Project, project => project.client)
+  @ManyToOne(() => Project, project => project.client, { onDelete: 'CASCADE' })
   @JoinColumn([
     { name: "project_id", referencedColumnName: "id" },
   ])
   project: number;
 
-  @OneToMany(() => MessagesHistory, messagesHistory => messagesHistory.client)
+  @OneToMany(() => MessagesHistory, messagesHistory => messagesHistory.client, { onDelete: 'CASCADE' })
   messages_history: MessagesHistory[];
 
-  @OneToMany(() => ChangesHistory, changesHistory => changesHistory.client)
+  @OneToMany(() => ChangesHistory, changesHistory => changesHistory.client, { onDelete: 'CASCADE' })
   changesHistory: ChangesHistory[];
 
-  @OneToMany(() =>  Note, note => note.client)
+  @OneToMany(() =>  Note, note => note.client, { onDelete: 'CASCADE' })
   note: Note[];
 }

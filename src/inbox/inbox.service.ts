@@ -48,6 +48,10 @@ export class InboxService {
     };
   }
 
+  async deleteClientAppealByClientId(projectId: number, clientId: string) {
+    return await this.clientRepository.deleteClientAppealByClientId(projectId, clientId);
+  }
+
   async updateMessagesStatusByClientId(projectId: number, clientId: string, messagesStatusDto: MessageStatusDto) {
     return await this.clientRepository.updateMessagesStatusByClientId(projectId, clientId, messagesStatusDto);
   }

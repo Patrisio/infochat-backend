@@ -54,6 +54,14 @@ export class InboxController {
     return this.inboxService.addMessage(messageDto);
   }
 
+  @Post('/project/:projectId/client/:clientId/deleteClientAppealByClientId')
+  deleteClientAppealByClientId(
+    @Param('projectId') projectId: string,
+    @Param('clientId') clientId: string,
+  ) {
+    return this.inboxService.deleteClientAppealByClientId(parseInt(projectId), clientId);
+  }
+
   @Post('project/:projectId/client/:clientId/updateMessagesStatusByClientId')
   updateMessagesStatusByClientId(
     @Param('projectId') projectId: string,

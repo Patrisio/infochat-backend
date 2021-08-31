@@ -36,6 +36,27 @@ export class ClientRepository extends Repository<Client> {
     }
   }
 
+  async deleteClientAppealByClientId(projectId: number, clientId: string) {
+    try {
+      await getConnection()
+        .createQueryBuilder()
+        .delete()
+        .from(Client)
+        .where("project_id = :project_id AND id = :clientId", {
+          project_id: projectId,
+          clientId
+        })
+        .execute();
+
+      return {
+        statusCode: 200,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+  }
+
   async getMessagesHistoryByProjectId(projectId) {
     const data = await getConnection()
       .query(`

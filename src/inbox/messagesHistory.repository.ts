@@ -6,20 +6,20 @@ import { Client } from '../entities/client.entity';
 @EntityRepository(MessagesHistory)
 export class MessagesHistoryRepository extends Repository<MessagesHistory> {
   async getMessagesHistory(clientDto) {
-    const { isBlocked } = await getConnection()
+    const row = await getConnection()
       .createQueryBuilder()
       .select(`"isBlocked"`)
       .from(Client, 'client')
       .where('id = :clientId', { clientId: clientDto.clientId })
       .getRawOne();
     
-    if (isBlocked) {
+    if (row && row?.isBlocked) {
       return {
         id: null,
         clientId: '',
         projectId: '',
         messagesHistory: [],
-        isBlocked,
+        isBlocked: row?.isBlocked,
       };
     }
 
@@ -36,7 +36,7 @@ export class MessagesHistoryRepository extends Repository<MessagesHistory> {
       clientId: '',
       projectId: '',
       messagesHistory: data,
-      isBlocked,
+      isBlocked: row?.isBlocked, 
     };
   }
 

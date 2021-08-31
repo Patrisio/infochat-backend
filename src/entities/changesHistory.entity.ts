@@ -18,7 +18,7 @@ export class ChangesHistory extends BaseEntity {
   @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
   timestamp: Date
 
-  @ManyToOne(() => Client, client => client.changesHistory)
+  @ManyToOne(() => Client, client => client.changesHistory, { onDelete: 'CASCADE' })
   @JoinColumn([
     { name: "client_id", referencedColumnName: "id" },
   ])

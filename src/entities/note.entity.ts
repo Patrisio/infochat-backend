@@ -15,7 +15,7 @@ export class Note extends BaseEntity {
   @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
   timestamp: Date
 
-  @ManyToOne(() => Client, client => client.note)
+  @ManyToOne(() => Client, client => client.note, { onDelete: 'CASCADE' })
   @JoinColumn([
     { name: "client_id", referencedColumnName: "id" },
   ])
