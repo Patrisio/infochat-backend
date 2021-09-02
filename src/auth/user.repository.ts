@@ -70,7 +70,7 @@ export class UserRepository extends Repository<User> {
     return formattedTeammates;
   }
 
-  async updateTeammate(teammateDto: TeammateDataDto, projectId: number) {
+  async updateTeammate(teammateDto: TeammateDataDto, token: string) {
     const { password, oldEmail, ...updatedTeammateData } = teammateDto;
     let teammateData: any = updatedTeammateData;
 
@@ -95,6 +95,7 @@ export class UserRepository extends Repository<User> {
 
       return {
         code: 200,
+        token,
         status: 'success',
       }
     } catch (error) {

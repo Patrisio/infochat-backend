@@ -48,4 +48,11 @@ export class AuthController {
 
     return this.authService.getCurrentUser(accessToken);
   }
+
+  @Get('/:token/decodeJwt')
+  @UseGuards(AuthGuard())
+  decodeJwt(@Param('token') token) {
+    console.log(token, 'TOKEN');
+    return this.authService.decodeJwt(token);
+  }
 }

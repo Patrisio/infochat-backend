@@ -75,7 +75,7 @@ export class AuthService {
   }
 
   async sendEmail(teammateDto) {
-    const { inviteId, projectId, email } = teammateDto;
+    const { projectId, email } = teammateDto;
 
     const payload = { email };
     const accessToken = await this.jwtService.sign(payload);
@@ -96,5 +96,15 @@ export class AuthService {
         console.log('Erorr');
         console.log(err);
       });
+
+      return {
+        code: 200,
+        status: 'success',
+      }
+  }
+
+  async decodeJwt(token: string) {
+    const decodeToken = await this.jwtService.decode(token);
+    return decodeToken;
   }
 }
