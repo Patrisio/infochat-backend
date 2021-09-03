@@ -20,7 +20,12 @@ export class TeammatesService {
   }
 
   async updateTeammate(teammateDto, projectId) {
-    const token = await this.jwtService.sign({ email: teammateDto.email });
+    let token;
+    
+    if (teammateDto.role === 'owner') {
+      token = await this.jwtService.sign({ email: teammateDto.email });
+    }
+    
     return this.userRepository.updateTeammate(teammateDto, token);
   }
 

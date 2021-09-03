@@ -15,4 +15,7 @@ export class TeammateDataDto {
 
   @IsString()
   timezone: string;
+
+  @IsString()
+  role?: string;
 }

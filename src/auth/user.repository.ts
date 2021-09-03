@@ -95,7 +95,7 @@ export class UserRepository extends Repository<User> {
 
       return {
         code: 200,
-        token,
+        token: token ? token : null,
         status: 'success',
       }
     } catch (error) {
