@@ -177,4 +177,25 @@ export class ClientRepository extends Repository<Client> {
       throw new InternalServerErrorException();
     }
   }
+
+  async remapDialogsToSelectedTeammate(projectId: number, teammatesEmails: any) {
+    const { deletedTeammateEmail, teammateEmailForRemapDialogs } = teammatesEmails;
+
+    try {
+      await getConnection()
+        .createQueryBuilder()
+        .update(Client)
+        .set({ assignedTo: teammateEmailForRemapDialogs })
+        .where('project_id = :projectId AND assignedTo = :assignedTo', { projectId, assignedTo: deletedTeammateEmail })
+        .execute();
+
+      return {
+        code: 200,
+        status: 'success'
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+  }
 }

@@ -108,4 +108,8 @@ export class InboxService {
   async deleteNote(noteId: number) {
     return this.noteRepository.deleteNote(noteId);
   }
+
+  async remapDialogsToSelectedTeammate(projectId: number, teammatesEmails: any) {
+    return this.clientRepository.remapDialogsToSelectedTeammate(projectId, teammatesEmails);
+  }
 }

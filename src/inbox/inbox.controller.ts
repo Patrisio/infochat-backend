@@ -117,4 +117,15 @@ export class InboxController {
   ) {
     return this.inboxService.getChannels(parseInt(projectId));
   }
+
+  @Post('/project/:projectId/remapDialogsToSelectedTeammate')
+  remapDialogsToSelectedTeammate(
+    @Param('projectId') projectId: string,
+    @Body() teammatesEmails: {
+      deletedTeammateEmail: string,
+      teammateEmailForRemapDialogs: string,
+    }
+  ) {
+    return this.inboxService.remapDialogsToSelectedTeammate(parseInt(projectId), teammatesEmails);
+  }
 }
