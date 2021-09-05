@@ -18,21 +18,6 @@ export class InboxGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 
   private logger: Logger = new Logger('InboxGateway');
 
-  @SubscribeMessage('reduceUnreadCountAnybody')
-  reduceUnreadCountAnybody(client: Socket, payload: any): void {
-    client.broadcast.emit('reduceUnreadCountAnybody', payload);
-  }
-
-  @SubscribeMessage('reduceOpenedToAnybody')
-  reduceOpenedToAnybody(client: Socket, payload: any): void {
-    client.broadcast.emit('reduceOpenedToAnybody', payload);
-  }
-
-  @SubscribeMessage('updateAssignedToAnybody')
-  updateAssignedToAnybody(client: Socket, payload: any): void {
-    client.broadcast.emit('updateAssignedToAnybody', payload);
-  }
-
   @SubscribeMessage('updateTeammateOnlineStatus')
   updateTeammateOnlineStatus(client: Socket, payload: any): void {
     client.broadcast.emit('updateTeammateOnlineStatus', payload);
@@ -51,6 +36,16 @@ export class InboxGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   @SubscribeMessage('remapDialogsToSelectedTeammate')
   remapDialogsToSelectedTeammate(client: Socket, payload: any): void {
     client.broadcast.emit('remapDialogsToSelectedTeammate', payload);
+  }
+
+  @SubscribeMessage('updateIncomingMessage')
+  updateIncomingMessage(client: Socket, payload: any): void {
+    client.broadcast.emit('updateIncomingMessage', payload);
+  }
+
+  @SubscribeMessage('updateSelectedClient')
+  updateSelectedClient(client: Socket, payload: any): void {
+    client.broadcast.emit('updateSelectedClient', payload);
   }
 
   afterInit(server: Server) {
