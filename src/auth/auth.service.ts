@@ -42,7 +42,7 @@ export class AuthService {
     if (user) {
       users = await this.userRepository.find({ relations: ['projects'] });
     } else {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Такого пользователя не существует');
     }
 
     const foundUser = users.find((userItem: any) => userItem.id === user.id);
