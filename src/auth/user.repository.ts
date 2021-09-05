@@ -135,7 +135,7 @@ export class UserRepository extends Repository<User> {
       };
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('User with this email already exist');
+        throw new ConflictException('Пользователь с таким email уже существует');
       } else {
         console.log(error);
         throw new InternalServerErrorException();
@@ -149,8 +149,8 @@ export class UserRepository extends Repository<User> {
     const projectRepository = await getConnection().getRepository(Project);
     const projects = await projectRepository.find({ relations: ["users"] });
     const project = projects.find((project) => project.id === parseInt(projectId));
-
     const user = await this.findOne({ email });
+    
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
     user.username = username;
