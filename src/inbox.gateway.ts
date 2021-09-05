@@ -48,6 +48,11 @@ export class InboxGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     client.broadcast.emit('updateSelectedClient', payload);
   }
 
+  @SubscribeMessage('deleteFromInboxIncomingMessage')
+  deleteFromInboxIncomingMessage(client: Socket, payload: any): void {
+    client.broadcast.emit('deleteFromInboxIncomingMessage', payload);
+  }
+
   afterInit(server: Server) {
     this.logger.log('Init');
   }
