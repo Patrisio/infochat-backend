@@ -60,7 +60,7 @@ export class AuthService {
         projectId,
       };
     } else {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Неверный логин или пароль');
     }
   }
 
