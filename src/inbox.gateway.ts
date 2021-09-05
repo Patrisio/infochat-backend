@@ -47,6 +47,11 @@ export class InboxGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   changeMessagesStatus(client: Socket, payload: any): void {
     client.broadcast.emit('changeMessagesStatus', payload);
   }
+  
+  @SubscribeMessage('remapDialogsToSelectedTeammate')
+  remapDialogsToSelectedTeammate(client: Socket, payload: any): void {
+    client.broadcast.emit('remapDialogsToSelectedTeammate', payload);
+  }
 
   afterInit(server: Server) {
     this.logger.log('Init');
