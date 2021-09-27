@@ -18,8 +18,6 @@ const chat_gateway_1 = require("./chat.gateway");
 const mailer_1 = require("@nestjs-modules/mailer");
 const teammates_module_1 = require("./teammates/teammates.module");
 const inbox_gateway_1 = require("./inbox.gateway");
-const serve_static_1 = require("@nestjs/serve-static");
-const path_1 = require("path");
 const channels_module_1 = require("./channels/channels.module");
 const templates_module_1 = require("./templates/templates.module");
 const projects_module_1 = require("./projects/projects.module");
@@ -44,9 +42,6 @@ AppModule = __decorate([
                 defaults: {
                     from: '"nest-modules" <modules@nestjs.com>',
                 }
-            }),
-            serve_static_1.ServeStaticModule.forRoot({
-                rootPath: path_1.join(__dirname, '..', 'build'),
             }),
             channels_module_1.ChannelsModule,
             templates_module_1.TemplatesModule,

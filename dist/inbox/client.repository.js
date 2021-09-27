@@ -10,7 +10,7 @@ exports.ClientRepository = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const client_entity_1 = require("../entities/client.entity");
-const changesHistory_entity_1 = require("src/entities/changesHistory.entity");
+const changesHistory_entity_1 = require("../entities/changesHistory.entity");
 let ClientRepository = class ClientRepository extends typeorm_1.Repository {
     async findDuplicateByClientId(clientId) {
         return await this.findOne({ id: clientId });
