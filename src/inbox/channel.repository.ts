@@ -42,8 +42,8 @@ export class ChannelRepository extends Repository<Channel> {
         .execute();
 
       return {
-        code: 200,
-        channels,
+        statusCode: 200,
+        data: channels,
       };
     } catch (error) {
       console.log(error);

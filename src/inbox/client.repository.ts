@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash';
 import { MessageStatusDto } from './dto/message-status.dto';
 import { ClientDataDto } from './dto/client-data.dto';
 import { executionAsyncResource } from 'async_hooks';
-import { ChangesHistory } from 'src/entities/changesHistory.entity';
+import { ChangesHistory } from '../../src/entities/changesHistory.entity';
 
 @EntityRepository(Client)
 export class ClientRepository extends Repository<Client> {

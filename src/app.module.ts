@@ -33,6 +33,14 @@ import { ProjectsModule } from './projects/projects.module';
           pass: 'secret.1'
         }
       },
+      // transport: {
+      //   host: 'smtp-relay.sendinblue.com',
+      //   port: 587,
+      //   auth: {
+      //     user: 'bugvfyctdx56c7v8@rambler.ru',
+      //     pass: 'CvMtGHWUTK5NOxwj'
+      //   }
+      // },
       
       defaults: {
         from:'"nest-modules" <modules@nestjs.com>',

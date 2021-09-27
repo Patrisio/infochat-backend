@@ -162,8 +162,8 @@ export class UserRepository extends Repository<User> {
       project.save();
 
       return {
-        code: 200,
-        status: 'success'
+        statusCode: 200,
+        status: 'success',
       };
     } catch (error) {
       console.log(error);

@@ -41,7 +41,7 @@
 
     const getChatWindowAttributes = (projectId, clientId) => {
       return {
-        'src': `http://localhost:3001/project/${projectId}/iframe/${clientId}`,
+        'src': `${host}/project/${projectId}/iframe/${clientId}`,
         'name': 'blyak_chat',
         'id': 'chatWindow',
         'width': '350',
@@ -52,7 +52,7 @@
 
     const getChatTriggerAttributes = (projectId, clientId) => {
       return {
-        'src': `http://localhost:3001/project/${projectId}/iframe/${clientId}/chatTrigger`,
+        'src': `${host}/project/${projectId}/iframe/${clientId}/chatTrigger`,
         'name': 'chat_trigger',
         'id': 'chatTrigger',
         'width': '50',
@@ -125,7 +125,7 @@
         chatWindowIframe.contentWindow.postMessage({
           event: 'updateData',
           data: message
-        }, 'http://localhost:3000');
+        }, `${host}`);//'http://localhost:3000'
         break;
       case 'updateChatSettings':
         let chatSettings;
@@ -161,12 +161,13 @@
         localStorage.setItem('rulesSteps', JSON.stringify(rulesSteps));
         break;
       case 'getDataFromClientWebsite':
+        console.log('eeeeeeeeee');
         chatWindowIframe.contentWindow.postMessage({
           event: 'acceptDataFromClientWebsite',
           localStorageClientChatSettings: localStorage.getItem('chatSettings'),
           origin: window.location.href,
           localStorageRulesSteps: localStorage.getItem('rulesSteps')
-        }, 'http://localhost:3000');
+        }, `${host}`); //'http://localhost:3000'
         break;
       case 'closeChatWindowIframe':
         const chatWindowIframeNode = document.getElementById('chatWindow');
@@ -178,7 +179,7 @@
   };
 
   window.addEventListener('message', function(e) {
-    console.log(e.data);
+    console.log(e.data, 'PPPPPPPPPPP');
     handlePostMessage(e.data);
   });
 }(project_id));
