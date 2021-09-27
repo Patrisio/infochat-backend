@@ -12,7 +12,7 @@ export class MessagesHistory extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   message: string
 
   @Column()
