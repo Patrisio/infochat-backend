@@ -6,7 +6,16 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const whitelist = ['https://thirsty-kirch-c8b82a.netlify.app', 'http://localhost:3001', 'https://infochat-production.herokuapp.com'];
     app.enableCors({
-        origin: 'https://thirsty-kirch-c8b82a.netlify.app',
+        origin: function (origin, callback) {
+            if (whitelist.indexOf(origin) !== -1) {
+                console.log("allowed cors for:", origin);
+                callback(null, true);
+            }
+            else {
+                console.log("blocked cors for:", origin);
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         methods: 'GET,POST',
     });
     await app.listen(process.env.PORT || 3005);
