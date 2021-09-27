@@ -15,7 +15,7 @@ export class MessagesHistory extends BaseEntity {
   @Column({ nullable: true })
   message: string
 
-  @Column()
+  @Column({ nullable: true })
   username: string
 
   @Column('timestamp', { default: (): string => 'LOCALTIMESTAMP' })
