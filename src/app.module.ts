@@ -46,9 +46,9 @@ import { ProjectsModule } from './projects/projects.module';
         from:'"nest-modules" <modules@nestjs.com>',
       }
     }),
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'build'),
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'build'),
+    }),
     ChannelsModule,
     TemplatesModule,
     ProjectsModule,
