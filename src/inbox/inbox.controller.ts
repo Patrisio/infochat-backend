@@ -39,7 +39,7 @@ export class InboxController {
         }
 
         const host = process.env.NODE_ENV === 'production' ?
-          'https://infochat-production.herokuapp.com/' :
+          'https://infochat-production.herokuapp.com' :
           'http://localhost:3001';
     
         const widgetScriptFileWithProjectIdArgument = data.replace(/project_id/g, projectId);
