@@ -26,7 +26,7 @@
     "build": "tsc -p tsconfig.build.json",
     "prestart:prod": "rimraf dist && npm run build",
     "postinstall": "npm run prestart:prod",
-    "start:prod": "node dist/src/main.js"
+    "start:prod": "node dist/main.js"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.5.1",
