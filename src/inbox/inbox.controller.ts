@@ -37,9 +37,15 @@ export class InboxController {
         if (err) {
           return console.log(err);
         }
+
+        const host = process.env.NODE_ENV === 'production' ?
+          'https://infochat-production.herokuapp.com/' :
+          'http://localhost:3001';
     
-        const widgetScriptFile = data.replace(/project_id/g, projectId);
-        res.send(widgetScriptFile);
+        const widgetScriptFileWithProjectIdArgument = data.replace(/project_id/g, projectId);
+        const widgetScriptFileWithAllArguments = widgetScriptFileWithProjectIdArgument.replace(/env_host/g, host);
+
+        res.send(widgetScriptFileWithAllArguments);
       }
     );
   }

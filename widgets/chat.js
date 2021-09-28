@@ -1,8 +1,4 @@
-(function(projectId) {
-  const host = process.env.NODE_ENV === 'production' ?
-  'https://infochat-production.herokuapp.com/' :
-  'http://localhost:3001';
-
+(function(projectId, host) {
   const generateRandomHash = () => {
     const hash1 = Math.random().toString(36).substr(2, 8);
     const hash2 = Math.random().toString(36).substr(2, 8);
@@ -186,4 +182,4 @@
     console.log(e.data, 'PPPPPPPPPPP');
     handlePostMessage(e.data);
   });
-}(project_id));
+}(project_id, 'env_host'));
