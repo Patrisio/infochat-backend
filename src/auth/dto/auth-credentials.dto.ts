@@ -13,6 +13,9 @@ export class AuthCredentialsDto {
   email: string;
 
   @IsString()
+  projectName: string;
+
+  @IsString()
   @MinLength(8)
   @MaxLength(20)
   password: string;

@@ -11,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 export class UserRepository extends Repository<User> {
   async signUp(authCredentialsDto: AuthCredentialsDto) {
     console.log('CONTROLLER');
-    const { username, phone, email, password, role, status } = authCredentialsDto;
+    const { username, phone, email, projectName, password, role, status } = authCredentialsDto;
 
     const user = new User();
     const project = new Project();
@@ -26,7 +26,7 @@ export class UserRepository extends Repository<User> {
     user.balance = 0;
     
     try {
-      project.name = 'project_name333';
+      project.name = projectName;
       await user.save();
       project.users = [user];
 

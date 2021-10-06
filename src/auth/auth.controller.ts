@@ -5,13 +5,11 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { InviteDto } from '../auth/dto/invite.dto';
 import { TeammateDto } from '../teammates/dto/teammate.dto';
-import { User } from '../entities/user.entity';
-import { GetUser } from './get-user.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   @Post('/signup')
